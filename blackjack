@@ -1,0 +1,76 @@
+#!/bin/bash
+
+cards=( 2 3 4 5 6 7 8 9 10 10 10 "Ace" )
+opponent_outcomes=( 7 10 10 13 15 14 15 15 17 17 18 18 18 20 20  )
+random_choice=$(("RANDOM % 13"))
+
+card=${cards[$random_choice]}
+echo Card: "$card"
+if [ "$card" == "Ace" ]
+then
+	echo -n "Would you like to have your ace be a 1 or 11: "
+	read -r ace_state
+if [ "$ace_state" == 11 ]
+then
+	card=11
+elif [ "$ace_state" == 1 ]
+then 
+	card=1
+fi
+fi
+
+sum_of_cards=$card
+
+while [ "$sum_of_cards" -le 21 ]
+do
+	random_choice=$((RANDOM % 13))
+	card=${cards[$random_choice]}
+	echo Card: "$card"
+	if [ "$card" == "Ace" ]
+	then
+		echo -n "Would you like to have your ace be a 1 or 11: "
+		read -r ace_state
+		if [ "$ace_state" == 11 ]
+		then
+			card=11
+		elif [ "$ace_state" == 1 ]
+		then 
+			card=1
+		fi
+
+	fi
+	sum_of_cards=$(("$card" + "$sum_of_cards"))
+	echo Sum of cards: $sum_of_cards
+
+	if [ "$sum_of_cards" -gt 21 ]
+	then
+		echo "You went over"
+		exit
+	fi
+
+	echo -n "Would you like to hit or stand: "
+	read -r hit_or_stand
+	
+	if [ "$hit_or_stand" == stand ]
+	then
+		opponent_random_choice=$(echo "$RANDOM % 15" | bc)
+		opponent_cards=${opponent_outcomes[$opponent_random_choice]}
+		if [ "$sum_of_cards" -gt "$opponent_cards" ]
+		then
+			echo "You won!"
+			echo Opponent Hand: "$opponent_cards"
+			exit
+		elif [ "$sum_of_cards" -lt "$opponent_cards" ]
+		then
+			echo "You lost!"
+			echo Opponent Hand: "$opponent_cards"
+			exit
+		elif [ "$sum_of_cards" == "$opponent_cards" ]
+		then
+			echo "Tie!"
+			echo Opponent Hand: "$opponent_cards"
+			exit
+		fi
+	fi
+done
+
